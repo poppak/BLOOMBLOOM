@@ -1,0 +1,192 @@
+.scrollable-content {
+    max-height: 100vh; /* устанавливаем максимальную высоту элемента */
+    overflow-y: auto; /* включаем вертикальный скролл */
+}
+
+.bg-rose {
+    background-color: rgba(243, 160, 213, 0.2);
+}
+@font-face {
+    font-family: 'Le Havre Titling Light';
+    src: url('le-havre-titling.otf') format('opentype');
+    font-stretch: 150%;
+}
+.custom-navbar {
+    font-size: 20px;
+    color: #f3a0d5;
+    font-weight: 400;
+    font-family: 'Futura PT', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-primary {
+    font-weight: 300;
+    --bs-btn-bg: none;
+    --bs-btn-border-color: none;
+    --bs-btn-color: black;
+    --bs-btn-hover-bg: none;
+    --bs-btn-hover-border-color: none;
+    --bs-btn-hover-color: black;
+    --bs-btn-active-bg: none;
+    --bs-btn-active-border-color: none;
+    --bs-btn-active-color: black;
+}
+
+.container-fluid{
+    --bs-gutter-x: 0rem;
+}
+
+a {
+    color: #f3a0d5;
+}
+
+body{
+    font-family: 'Futura PT', sans-serif;
+    font-weight: 300;
+}
+
+.btn-1{
+    background-color: transparent;
+    font-size: 24px;
+    border: transparent;
+    color: #f3a0d5;
+    font-family: 'Futura PT', sans-serif;
+    --bs-btn-active-bg: none;
+}
+.btn-1:hover {
+    background-color: transparent;
+    font-size: 24px;
+    border: transparent;
+    color: #ffffff;
+    justify-content: right;
+}
+
+
+.btn-2{
+    background-color: transparent;
+    font-size: 20px;
+    border: transparent;
+    color: #f3a0d5;
+    font-family: 'Futura PT', sans-serif;
+    font-weight: 400;
+    --bs-btn-active-bg: none;
+}
+.btn-2:hover{
+    background-color: transparent;
+    font-size: 20px;
+    border: transparent;
+    color: #f3a0d5;
+    justify-content: right;
+}
+
+.btn-3{
+    background-color: transparent;
+    color: grey;
+    border: none;
+    height: 100%;
+    line-height: 0px;
+    text-align: center;
+    background-position: center;
+    --bs-btn-hover-color: black;
+    --bs-btn-active-bg: none;
+    --bs-btn-hover-bg: none;
+    --bs-btn-padding-x: 0;
+    --bs-btn-padding-y: 0;
+}
+
+.btn-4{
+    background-color: transparent;
+    border: transparent;
+    color: rgb(191, 155, 209);
+    font-family: 'Futura PT', sans-serif;
+    --bs-btn-active-bg: none;
+    width: 60px;
+    margin-right: 1%;
+}
+.btn-4:hover {
+    background-color: transparent;
+    border: transparent;
+    color: #ffffff;
+    justify-content: right;
+}
+.btn-5{
+    background-color: transparent;
+    border: transparent;
+    font-size: 14px;
+    color: rgb(191, 155, 209);
+    font-weight: 300;
+    font-family: 'Futura PT', sans-serif;
+    --bs-btn-active-bg: none;
+    width: 105px;
+    margin-left: 1%;
+}
+.btn-5:hover {
+    background-color: transparent;
+    border: transparent;
+    color: #ffffff;
+    justify-content: right;
+}
+
+
+.image-container:hover::after {
+    content: attr(data-name);
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 5px;
+    z-index: 1;
+}
+.btn-6{
+    background-color: #f3a0d5;
+    font-size: 14px;
+    border: transparent;
+    border-radius: 70px;
+    color: white;
+    font-family: 'Futura PT', sans-serif;
+    --bs-btn-active-bg: none;
+    width: 110px;
+    height: 50px;
+    font-weight: 400;
+}
+.btn-6:hover {
+    background-color: #f3a0d5;
+    border: transparent;
+    color: #ffffff;
+    justify-content: right;
+}
+
+.pageBackground {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(255, 255, 255, 0.65);
+    z-index: 999;
+}
+.dropdown-toggle::after {
+    content: ' ';
+    width: 5px;
+    height: 5px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: transparent #000 #000 transparent;
+    position: absolute;
+    transform: rotate(45deg);
+    top: -2px;
+    bottom: 0;
+    margin: auto;
+    margin-left: 0.4em;
+    pointer-events: none;
+}
+
+.dropdown-menu {
+    --bs-dropdown-link-active-bg: #f3a0d5;
+
+}
+
+table {
+
+}

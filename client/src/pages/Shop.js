@@ -2,12 +2,37 @@ import React, {useContext, useEffect, useState} from 'react';
 import {Container, DropdownButton, Row, Dropdown} from "react-bootstrap";
 import {Context} from "../index";
 import PreorderProductList from "../components/PreorderProductList";
+import {fetchCategories, fetchPreorderProducts, fetchProducts, fetchPurchases} from "../http/productAPI";
 
 const Shop = () => {
-    const {product} = useContext(Context)
+    const { product } = useContext(Context);
+    const [loading, setLoading] = useState(true);
     const [selectedCategoryName, setSelectedCategoryName] = useState("preorder");
-    const [products, setProducts] = useState([]);
-    console.log(product.selectedCategory.id);
+    const [filteredProducts, setFilteredProducts] = useState([])
+
+    useEffect(() => {
+        Promise.all([
+            fetchCategories(),
+            fetchProducts(),
+            fetchPurchases(),
+            fetchPreorderProducts()
+        ]).then(([categories, products, purchases, preorderProducts]) => {
+            product.setCategories(categories);
+            product.setProducts(products);
+            product.setFilteredProducts(products);
+            product.setPurchases(purchases);
+            product.setPreorderProducts(preorderProducts);
+            setLoading(false);
+        }).catch(error => {
+            console.error('Error loading data:', error);
+            setLoading(false);
+        });
+    }, [product]);
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
     const handleCategorySelect = (category) => {
         console.log(category.id);
         if (product.selectedCategory && product.selectedCategory.id === category.id) {
@@ -16,7 +41,9 @@ const Shop = () => {
         filterCategoryProducts(category.id);
         setSelectedCategoryName(category.name);
     }
-
+    if (product.purchases) {
+        console.log(product.purchases);
+    }
     const purchase = product.purchases.find(pur => pur.statusPurchase === "Запись открыта").id
     product.preorderProducts.forEach((preorderProduct) => {
         if (preorderProduct.purchaseId === purchase) {
@@ -24,7 +51,8 @@ const Shop = () => {
             if (productToAdd && !product.preorderedProducts.some(p => p.id === productToAdd.id)) {
                 const extendedProduct = {
                     ...productToAdd,
-                    price: preorderProduct.price
+                    price: preorderProduct.price,
+                    purchaseId: preorderProduct.purchaseId
                 };
                 product.setPreorderedProducts([...product.preorderedProducts, extendedProduct]);
             } else if (!productToAdd) {
@@ -34,10 +62,10 @@ const Shop = () => {
             console.log(preorderProduct.id + ' не входит в закупку');
         }
     });
-    console.log(product.preorderedProducts)
+    console.log(product.filteredProducts)
     const filterCategoryProducts = (categoryId) => {
-        const filteredProducts = product.preorderedProducts.filter(product => product.categoryId === categoryId);
-        product.setFilteredProducts(filteredProducts);
+        setFilteredProducts(product.preorderedProducts.filter(product => product.categoryId === categoryId));
+        console.log(filteredProducts)
     }
 
     return (
@@ -47,7 +75,7 @@ const Shop = () => {
             </Row>
             <Row>
                 <DropdownButton id="dropdown-basic-button" title="Категория" style={{fontSize: '14px'}}>
-                    {product.categories.map(category =>
+                    {product.categories && product.categories.map(category =>
                         <Dropdown.Item
                             onClick={() => handleCategorySelect(category)}
                             key={category.id}
@@ -58,7 +86,7 @@ const Shop = () => {
                     )}
                 </DropdownButton>
             </Row>
-            <PreorderProductList/>
+            <PreorderProductList preorderedProducts={product.preorderedProducts} filteredProducts={filteredProducts} selectedCategory={selectedCategoryName}/>
         </Container>
     );
 

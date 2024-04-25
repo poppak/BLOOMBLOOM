@@ -1,11 +1,18 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Context} from "../../index";
 import {Button, Col, Dropdown, DropdownMenu, DropdownToggle, Form, Image, Modal, Row, Table} from "react-bootstrap";
 import SelectProducts from "./SelectProducts";
 import purchaseList from "../PurchaseList";
+import {fetchProducts, fetchPurchases} from "../../http/productAPI";
 
 const UpdatePurchase = ({show, onHide, selectedPurchase }) => {
     const {product} = useContext(Context)
+    useEffect(() => {
+        fetchPurchases().then(data => product.setPurchases(data))
+        fetchProducts().then(data => {
+            product.setProducts(data);
+        })
+    }, []);
     const [selectedStatus, setSelectedStatus] = useState('');
     const [productVisible, setProductVisible] = useState(false)
     const [selectedProducts, setSelectedProducts] = useState([]);
@@ -57,6 +64,15 @@ const UpdatePurchase = ({show, onHide, selectedPurchase }) => {
         }, 700);
     }
 
+    console.log(selectedPurchase.dateStart)
+    const formatDateToYYYYMMDD = (dateString) => {
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
     return (
         <Modal
             show={show}
@@ -104,11 +120,11 @@ const UpdatePurchase = ({show, onHide, selectedPurchase }) => {
                                 </Dropdown.Item>
                             </DropdownMenu>
                         </Dropdown>
-                        <Form.Control style={{width: 200}} placeholder={selectedStatus ? selectedStatus : selectedPurchase.status} readOnly />
+                        <Form.Control style={{width: 200}} placeholder={selectedStatus ? selectedStatus : selectedPurchase.statusPurchase} readOnly />
                     </Row>
                     <Row>
-                        <Col md={6} className="mt-2" style={{textAlign: 'center', alignItems: 'center', fontWeight: 400}}> Дата начала <Form.Control className="mt-2" type='date' style={{textAlign: 'center', fontWeight: 200}} id="startDate" onChange={handleEndDateChange} value={selectedPurchase.dateStart}/></Col>
-                        <Col md={6} className="mt-2" style={{textAlign: 'center', alignItems: 'center', fontWeight: 400}}> Дата окончания <Form.Control className="mt-2" type='date' style={{textAlign: 'center', fontWeight: 200}} id="endDate" onChange={handleEndDateChange} value={selectedPurchase.dateFinish}/></Col>
+                        <Col md={6} className="mt-2" style={{textAlign: 'center', alignItems: 'center', fontWeight: 400}}> Дата начала <Form.Control className="mt-2" type='date' style={{textAlign: 'center', fontWeight: 200}} id="startDate" onChange={handleEndDateChange} value={formatDateToYYYYMMDD(selectedPurchase.dateStart)}/></Col>
+                        <Col md={6} className="mt-2" style={{textAlign: 'center', alignItems: 'center', fontWeight: 400}}> Дата окончания <Form.Control className="mt-2" type='date' style={{textAlign: 'center', fontWeight: 200}} id="endDate" onChange={handleEndDateChange} value={formatDateToYYYYMMDD(selectedPurchase.dateFinish)}/></Col>
                     </Row>
                     <Row>
                         <Col md={6} className="mt-2" style={{textAlign: 'center', alignItems: 'center', fontWeight: 400}}> Минимальная сумма закупки <Form.Control className="mt-2" type='number' style={{textAlign: 'center', fontWeight: 200}} value={selectedPurchase.minSumma}/></Col>
@@ -142,7 +158,7 @@ const UpdatePurchase = ({show, onHide, selectedPurchase }) => {
                             <tr key={product.id} style={{fontSize: '18px'}}>
                                 <td style={{textAlign: 'center', fontSize: '16px'}}>{index + 1}</td>
                                 <td style={{textAlign: 'center'}}><Image width={50} height={50}
-                                                                         src={products.img}/></td>
+                                                                         src={process.env.REACT_APP_API_URL + product.img}/></td>
                                 <td style={{fontWeight: '400'}}>{product.name}</td>
                                 <td style={{fontSize: '18px'}}>{options.map(i => i !== null && i.productId === product.id ? i.name + '; ' : '')}</td>
                                 <td style={{fontSize: '18px'}}>

@@ -8,22 +8,23 @@ class ProductController {
         try {
             let {name, categoryId, description, options} = req.body
             const {img} = req.files
+            console.log(img)
             let fileName = uuid.v4() + ".jpg"
             img.mv(path.resolve(__dirname, '..', 'static', fileName))
             const product = await Product.create({name, categoryId, description, img: fileName})
 
             if (options) {
-                options = JSON.parse(options)
-                for (let i = 0; i < options.length; i++){
-                    const {img: optionImg} = req.files[`optionImg${i}`]
-                    let optionFileName = uuid.v4() + ".jpg"
-                    optionImg.mv(path.resolve(__dirname, '..', 'static', optionFileName))
+                options = JSON.parse(options);
+                options.forEach((option, index) => {
+                    const optionImg = req.files[`optionImg${index}`];
+                    let optionFileName = uuid.v4() + ".jpg";
+                    optionImg.mv(path.resolve(__dirname, '..', 'static', optionFileName));
                     Option.create({
-                        name: i.name,
+                        name: option.name,
                         img: optionFileName,
                         productId: product.id
-                    })
-                }
+                    });
+                });
             }
             return res.json(product)
         } catch (e) {

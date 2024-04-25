@@ -1,9 +1,13 @@
-import React, {useContext, useState} from 'react';
-import {Button, Col, Dropdown, DropdownMenu, DropdownToggle, Form, Modal, Row} from "react-bootstrap";
+import React, {useContext, useEffect, useState} from 'react';
+import {Button, Col, Dropdown, DropdownMenu, DropdownToggle, Form, Image, Modal, Row} from "react-bootstrap";
 import {Context} from "../../index";
+import {fetchCategories, fetchOptions, fetchProducts} from "../../http/productAPI";
 
 const UpdateProduct = ({show, onHide, selectedProduct }) => {
     const {product} = useContext(Context)
+    useEffect(() => {
+        fetchOptions().then(data => product.setOptions(data))
+    }, []);
     const [selectedCategory, setSelectedCategory] = useState(selectedProduct ? selectedProduct.category : '');
     const [option, setOption] = useState([])
     const cat = product.categories
@@ -60,7 +64,9 @@ const UpdateProduct = ({show, onHide, selectedProduct }) => {
                         </Dropdown>
                         <Form.Control style={{width: 150}} placeholder={selectedCategory ? selectedCategory : cat.find(category => category.id === selectedProduct.categoryId)?.name || ''}  readOnly />
                     </Row>
-                    <Form.Control className="mt-2" value={selectedProduct.img} type="file"/>
+                    <Col className="d-flex justify-content-center mt-2" style={{textAlign: 'center', alignItems: 'center', fontWeight: 300}}> Выберите изображение, если хотите его заменить </Col>
+                    <Form.Control className="mt-2" type="file"/>
+
                     <Form.Control
                         as="textarea"
                         rows={1}

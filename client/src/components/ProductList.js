@@ -1,10 +1,15 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Context} from "../index";
 import {Image, Row, Table} from "react-bootstrap";
 import UpdateProduct from "./modals/UpdateProduct";
+import {fetchCategories, fetchProducts} from "../http/productAPI";
 
 const ProductList = () => {
     const {product} = useContext(Context)
+    useEffect(() => {
+        fetchProducts().then(data => product.setProducts(data))
+        fetchCategories().then(data => product.setCategories(data))
+    }, []);
     const productsToDisplay = product.filteredProducts.length > 0 ? product.filteredProducts : product.products
     const cat = product.categories
     const options = product.options
@@ -30,7 +35,7 @@ const ProductList = () => {
             {productsToDisplay.map((product, index) => (
                 <tr key={product.id} style={{ fontSize: '20px' }} onClick={() => handleProductClick(index)}>
                     <td style={{ textAlign: 'center', fontSize: '16px' }}>{index + 1}</td>
-                    <td style={{ textAlign: 'center' }}><Image width={50} height={50} src={product.img} /></td>
+                    <td style={{ textAlign: 'center' }}><Image width={50} height={50} src={process.env.REACT_APP_API_URL + product.img} /></td>
                     <td style={{ fontWeight: '400' }}>{product.name}</td>
                     <td>{product.description}</td>
                     <td>{cat.find(category => category.id === product.categoryId).name}</td>

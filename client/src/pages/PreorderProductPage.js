@@ -1,25 +1,60 @@
-import React, {useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Button, Col, Container, Image, OverlayTrigger, Row, Tooltip} from "react-bootstrap";
 import QuantitySelector from "../components/QuantitySelector";
 import {SHOP_ROUTE} from "../utils/consts";
-import {useHistory} from "react-router-dom";
+import {useHistory, useLocation, useParams} from "react-router-dom";
 import {TfiClose} from "react-icons/tfi";
+import {Context} from "../index";
+import {
+    fetchCategories,
+    fetchOneProduct,
+    fetchPreorderProducts,
+    fetchProducts,
+    fetchPurchases
+} from "../http/productAPI";
 
 const PreorderProductPage = () => {
     const history = useHistory()
-    const [preorderProduct, setPreorderProduct] = useState({
-        id: 1,
-        name: 'Goodal Houttuynia Cordata Calming Sun Cream SPF50+ PA++++',
-        description: 'Глянцевый тинт для губ',
-        price: 1200,
-        img: 'https://optim.tildacdn.com/stor6263-6132-4864-b438-323866646436/-/format/webp/74012889.jpg',
-        selectedOption: null
-    });
-    const option = [
-        {id: 1, name: '01', productId: 1, img: 'https://optim.tildacdn.com/stor6364-3235-4134-b538-353130663633/-/format/webp/81928742.jpg'},
-        {id: 2, name: '02', productId: 1, img: 'https://optim.tildacdn.com/stor6364-3235-4134-b538-353130663633/-/format/webp/81928742.jpg'},
-        {id: 3, name: '03', productId: 1, img: 'https://optim.tildacdn.com/stor6364-3235-4134-b538-353130663633/-/format/webp/81928742.jpg'},
-    ]
+    const {product} = useContext(Context)
+    const {id} = useParams()
+    const [loading, setLoading] = useState(true);
+    const [preorderProduct, setPreorderProduct] = useState('')
+
+    useEffect(() => {
+        Promise.all([
+            fetchCategories(),
+            fetchProducts(),
+            fetchPurchases(),
+            fetchPreorderProducts(),
+            fetchOneProduct(id)
+        ]).then(([categories, products, purchases, preorderProducts, preorderProduct]) => {
+            product.setProducts(products);
+            product.setPurchases(purchases);
+            product.setPreorderProducts(preorderProducts);
+            setPreorderProduct(preorderProduct)
+            setLoading(false);
+        }).catch(error => {
+            console.error('Error loading data:', error);
+            setLoading(false);
+        });
+    }, [product]);
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    const pr = product.preorderProducts.filter(i =>
+            (i.purchaseId === product.purchases.find(i => i.statusPurchase === 'Запись открыта').id)
+            && (i.productId === preorderProduct.id)
+    )
+    const optionIds = pr.map(i => i.optionId)
+    const option = preorderProduct.options.filter((i, index) =>
+        i.id === optionIds[index]
+    )
+    const price = pr.find(i => i.id).price
+    console.log(option)
+    console.log(pr)
+
     const handleOptionSelect = (option) => {
         console.log(option.id);
         setPreorderProduct(prevState => ({
@@ -46,16 +81,16 @@ const PreorderProductPage = () => {
                 <Container style={{marginTop: '5.5%'}}>
                     <Row>
                         <Col md={6} style={{textAlign: 'right', paddingRight: '30px'}}>
-                            <Image width={470} height={470} src={preorderProduct.img}/>
+                            <Image width={470} height={470} src={process.env.REACT_APP_API_URL + preorderProduct.img}/>
                         </Col>
                         <Col md={5}>
                             <div style={{fontWeight: 500, fontSize: '22px'}} className="mt-2">
                                 {preorderProduct.name}
                             </div>
                             <div style={{fontWeight: 500, fontSize: '22px', color: '#f3a0d5'}} className="mt-3">
-                                {preorderProduct.price + ' р.'}
+                                {price + ' р.'}
                             </div>
-                            <div className="mt-4" style={{fontSize: '16px'}}>Версия</div>
+                            {option === [] ? <div className="mt-4" style={{fontSize: '16px'}}>Версия</div> : ''}
                             <Row>
 
                                 {option.map(info =>
@@ -67,7 +102,7 @@ const PreorderProductPage = () => {
                                                 justifyContent: 'center',
                                                 alignItems: 'center'
                                             }}>
-                                                <Image width={50} height={50} src={info.img} style={{outline: 'solid', outlineWidth: 0.1, outlineColor: 'lightgrey',}}
+                                                <Image width={50} height={50} src={process.env.REACT_APP_API_URL + info.img} style={{outline: 'solid', outlineWidth: 0.1, outlineColor: 'lightgrey',}}
                                                        key={info.id}
                                                        onClick={() => handleOptionSelect(info)}/>
                                             </div>

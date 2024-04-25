@@ -1,11 +1,21 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Context} from "../index";
 import {Button, Container, Dropdown, DropdownButton, Row} from "react-bootstrap";
 import ProductList from "../components/ProductList";
 import CreateProduct from "../components/modals/CreateProduct";
+import {fetchCategories, fetchProducts} from "../http/productAPI";
+import {observer} from "mobx-react-lite";
 
-const ProductPage = () => {
+const ProductPage = observer(() => {
     const {product} = useContext(Context)
+    useEffect(() => {
+        fetchProducts().then(data => {
+            product.setProducts(data);
+            product.setFilteredProducts(data);
+        })
+        fetchCategories().then(data => product.setCategories(data))
+    }, []);
+
     const [productVisible, setProductVisible] = useState(false)
     const [selectedCategoryName, setSelectedCategoryName] = useState("Товары");
     const handleCategorySelect = (category) => {
@@ -50,6 +60,6 @@ const ProductPage = () => {
         </Container>
     );
 
-};
+});
 
 export default ProductPage;

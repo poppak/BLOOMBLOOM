@@ -1,13 +1,27 @@
 const ApiError = require('../error/ApiError')
-const {Purchase} = require("../models/models");
+const {Purchase, PreorderProduct} = require("../models/models");
 const uuid = require("uuid");
 const path = require("path");
 
 class PurchaseController {
     async create(req, res, next) {
         try {
-            let {dateStart, dateFinish, minSumma, factSumma, planDelivery, factDelivery, statusPurchase} = req.body
-            const purchase = await Product.create({dateStart, dateFinish, minSumma, factSumma, planDelivery, factDelivery, statusPurchase})
+            let {dateStart, dateFinish, minSumma, factSumma, planDelivery, factDelivery, statusPurchase, preorderProducts} = req.body
+            const purchase = await Purchase.create({dateStart, dateFinish, minSumma, factSumma, planDelivery, factDelivery, statusPurchase})
+
+            if (preorderProducts) {
+                preorderProducts = JSON.parse(preorderProducts);
+                console.log(preorderProducts)
+                preorderProducts.forEach(i =>
+                    PreorderProduct.create({
+                        price: i.price,
+                        productId: i.productId,
+                        optionId: i.optionId,
+                        purchaseId: purchase.id,
+                        quantity: i.quantity
+                    })
+                )
+            }
             return res.json(purchase)
         } catch (e) {
             next(ApiError.badRequest(e.message))

@@ -1,12 +1,16 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Context} from "../index";
 import {Button, Container, Dropdown, DropdownButton, Row} from "react-bootstrap";
 import PurchaseList from "../components/PurchaseList";
 import CreateProduct from "../components/modals/CreateProduct";
 import CreatePurchase from "../components/modals/CreatePurchase";
+import {fetchProducts, fetchPurchases} from "../http/productAPI";
 
 const PurchasePage = () => {
     const {product} = useContext(Context)
+    useEffect(() => {
+        fetchPurchases().then(data => product.setPurchases(data))
+    }, []);
     const [productVisible, setProductVisible] = useState(false)
 
     return (

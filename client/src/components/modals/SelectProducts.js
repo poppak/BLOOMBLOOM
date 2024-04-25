@@ -1,9 +1,15 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Context} from "../../index";
 import {Button, Form, Image, Modal, Table} from "react-bootstrap";
+import {fetchOptions, fetchPreorderProducts, fetchProducts} from "../../http/productAPI";
 
 const SelectProducts = ({show, onHide, selectedProducts, setSelectedProducts}) => {
     const {product} = useContext(Context)
+    useEffect(() => {
+        fetchProducts().then(data => product.setProducts(data))
+        fetchPreorderProducts().then(data => product.setPreorderProducts(data))
+        fetchOptions().then((data => product.setOptions(data)))
+    }, []);
     const products = product.products
     const options = product.options
 
@@ -72,7 +78,7 @@ const SelectProducts = ({show, onHide, selectedProducts, setSelectedProducts}) =
                                                     checked={selectedProducts.some(sp => sp.product.id === product.id && sp.options.includes(option))}
                                                 />
                                             </td>
-                                            <td style={{ textAlign: 'center' }}><Image width={50} height={50} src={product.img} /></td>
+                                            <td style={{ textAlign: 'center' }}><Image width={50} height={50} src={process.env.REACT_APP_API_URL + product.img} /></td>
                                             <td style={{ fontWeight: '400' }}>{product.name}</td>
                                             <td>{option.name}</td>
                                         </tr>
@@ -84,7 +90,7 @@ const SelectProducts = ({show, onHide, selectedProducts, setSelectedProducts}) =
                                                 checked={selectedProducts.some(sp => sp.product.id === product.id)}
                                             />
                                         </td>
-                                        <td style={{ textAlign: 'center' }}><Image width={50} height={50} src={product.img} /></td>
+                                        <td style={{ textAlign: 'center' }}><Image width={50} height={50} src={process.env.REACT_APP_API_URL + product.img} /></td>
                                         <td style={{ fontWeight: '400' }}>{product.name}</td>
                                         <td></td>
                                     </tr>

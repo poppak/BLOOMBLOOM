@@ -1,7 +1,7 @@
 import React, {useContext, useState} from 'react';
 import {Button, Card, Container, Form, Row} from "react-bootstrap";
 import {NavLink, useHistory, useLocation} from "react-router-dom";
-import {LOGIN_ROUTE, REGISTRATION_ROUTE, SHOP_ROUTE} from "../utils/consts";
+import {LOGIN_ROUTE, REGISTRATION_ROUTE, ADMIN_ROUTE} from "../utils/consts";
 import {login, registration} from "../http/userAPI";
 import {observer} from "mobx-react-lite";
 import {Context} from "../index";
@@ -27,7 +27,7 @@ const Auth = observer(() => {
             }
             user.setUser(user)
             user.setIsAuth(true)
-            history.push(SHOP_ROUTE)
+            history.push(ADMIN_ROUTE)
         } catch (e) {
             alert(e.response.data.message)
         }

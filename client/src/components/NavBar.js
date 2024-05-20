@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import {Context} from "../index";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
@@ -6,13 +6,20 @@ import {Button, Container} from "react-bootstrap";
 import '../css/style.css'
 import {observer} from "mobx-react-lite";
 import {useHistory} from "react-router-dom";
-import {ADMIN_ROUTE, LOGIN_ROUTE, SHOP_ROUTE} from "../utils/consts";
+import {ADMIN_ROUTE, LOGIN_ROUTE, SHOP_ROUTE, USER_ROUTE} from "../utils/consts";
 import {BsBoxArrowRight, BsBoxArrowInRight, BsPersonFill, BsFileSpreadsheet} from 'react-icons/bs';
+import Basket from "../components/modals/Basket";
+import {LiaShoppingBagSolid} from "react-icons/lia";
+import {HiOutlineShoppingBag} from "react-icons/hi";
+import {PiHandbagLight} from "react-icons/pi";
+import {SlHandbag} from "react-icons/sl";
+import {RiAdminFill} from "react-icons/ri";
 
 
 const NavBar = observer(() => {
     const {user} = useContext(Context)
     const history = useHistory()
+    const [basketVisible, setBasketVisible] = useState(false)
 
     const logOut = () => {
         user.setUser({})
@@ -29,12 +36,12 @@ const NavBar = observer(() => {
                     {user.isAuth ?
 
                         <Nav className="ml-auto">
-                            <Button onClick={() => history.push(ADMIN_ROUTE)} className="btn-1"><BsFileSpreadsheet
-                                style={{fontWeight: 'bold'}}/></Button>
-                            <Button onClick={() => history.push(SHOP_ROUTE)} className="btn-1"><BsPersonFill
-                                style={{fontWeight: 'bold'}}/></Button>
-                            <Button onClick={() => logOut()} className="btn-1"><BsBoxArrowRight
-                                style={{fontWeight: 'bold'}}/></Button>
+                            <Button onClick={() => setBasketVisible(true)} className="btn-1"><LiaShoppingBagSolid
+                                style={{width: '28px', height: '28px'}} />
+                                </Button>
+                            <Button onClick={() => history.push(ADMIN_ROUTE)} className="btn-1"><RiAdminFill /></Button>
+                            <Button onClick={() => history.push(USER_ROUTE)} className="btn-1"><BsPersonFill/></Button>
+                            <Button onClick={() => logOut()} className="btn-1"><BsBoxArrowRight/></Button>
                         </Nav>
                         :
                         <Nav className="ml-auto">
@@ -43,6 +50,7 @@ const NavBar = observer(() => {
                     }
                 </Container>
             </Navbar>
+            <Basket show={basketVisible} onHide={() => setBasketVisible(false)}/>
         </div>
     );
 });

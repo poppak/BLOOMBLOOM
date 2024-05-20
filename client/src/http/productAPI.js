@@ -19,6 +19,10 @@ export const fetchPurchases = async () => {
     const {data} = await $authHost.get('api/purchase')
     return data
 }
+export const updatePurchase = async (id, updatedPurchase) => {
+    const {data} = await $authHost.put(`api/purchase/${id}`, updatedPurchase);
+    return data;
+}
 export const fetchPreorderProducts = async () => {
     const {data} = await $host.get('api/preorder_product')
     return data
@@ -35,3 +39,40 @@ export const fetchOptions = async () => {
     const {data} = await $authHost.get('api/option')
     return data
 }
+export const fetchBaskets = async () => {
+    const {data} = await $authHost.get('api/basket/')
+    return data
+}
+export const createBasketProduct = async (product) => {
+    const {data} = await $authHost.post('api/basket_product', product)
+    return data
+}
+export const deleteBasketProduct = async (id) => {
+    const {data} = await $authHost.delete('api/basket_product/' + id)
+    return data
+}
+export const fetchBasketProducts = async () => {
+    const {data} = await $authHost.get('api/basket_product/')
+    return data
+}
+export const createOrder = async (order) => {
+    const {data} = await $authHost.post('api/order/', order)
+    return data
+}
+export const fetchOrders = async () => {
+    const {data} = await $authHost.get('api/order/')
+    return data
+}
+export const fetchOrdersProduct = async () => {
+    const {data} = await $authHost.get('api/order_product/')
+    return data
+}
+export const sendEmailNotification = async (subject, name, orderDetails) => {
+    try {
+        const { data } = await $authHost.post('api/sendEmailNotification/', { subject, name, orderDetails });
+        return data;
+    } catch (error) {
+        console.error('Ошибка при отправке уведомления на почту:', error);
+        throw error;
+    }
+};

@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {Context} from "../index";
-import {Image, Table} from "react-bootstrap";
+import {Button, Image, Table} from "react-bootstrap";
 import UpdateProduct from "./modals/UpdateProduct";
 import UpdatePurchase from "./modals/UpdatePurchase";
 import {fetchCategories, fetchPreorderProducts, fetchProducts, fetchPurchases} from "../http/productAPI";
@@ -21,7 +21,7 @@ const PurchaseList = () => {
             console.error('Error loading data:', error);
             setLoading(false);
         });
-    }, [product]);
+    }, []);
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -57,6 +57,7 @@ const PurchaseList = () => {
                     <td>{purchase.statusPurchase}</td>
                 </tr>
             ))}
+
             </tbody>
             <UpdatePurchase show={purchaseVisible} onHide={() => setPurchaseVisible(false)} selectedPurchase={selectedPurchaseIndex !== null ? purchasesToDisplay[selectedPurchaseIndex] : {}} />
         </Table>

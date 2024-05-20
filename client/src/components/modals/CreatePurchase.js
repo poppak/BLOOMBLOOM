@@ -18,6 +18,7 @@ const CreatePurchase = ({show, onHide}) => {
         fetchOptions().then(data => product.setOptions(data))
     }, []);
     const [selectedStatus, setSelectedStatus] = useState('');
+    const [selectedBaseCost, setSelectedBaseCost] = useState('');
     const [productVisible, setProductVisible] = useState(false)
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [preorderProduct, setPreorderProduct] = useState([])
@@ -38,7 +39,6 @@ const CreatePurchase = ({show, onHide}) => {
                             optionId: op.id,
                             productId: productId,
                             price: value,
-                            quantity: 0,
                             number: Date.now()
                         };
                         setPreorderProduct(prevProducts => [...prevProducts, newProduct]);
@@ -82,6 +82,9 @@ const CreatePurchase = ({show, onHide}) => {
     const handleSelectCategory = (categoryName) => {
         setSelectedStatus(categoryName);
     };
+    const handleSelectBaseCost = (baseName) => {
+        setSelectedBaseCost(baseName);
+    };
 
     let timeoutId;
     const handleEndDateChange = (event) => {
@@ -123,6 +126,7 @@ const CreatePurchase = ({show, onHide}) => {
         formData.append('dateStart', startDate)
         formData.append('dateFinish', endDate)
         formData.append('minSumma', `${minSumma}`)
+        formData.append('baseCost', `${selectedBaseCost}`)
         if (!isNaN(factSumma) && factSumma !== '') {
             formData.append('factSumma', `${factSumma}`)
         }
@@ -175,6 +179,12 @@ const CreatePurchase = ({show, onHide}) => {
                                 <Dropdown.Item style={{fontWeight: 200}} onClick={() => handleSelectCategory('Отправлена в РФ')}>
                                     Отправлена в РФ
                                 </Dropdown.Item>
+                                <Dropdown.Item style={{fontWeight: 200}} onClick={() => handleSelectCategory('Получена в РФ')}>
+                                    Получена в РФ
+                                </Dropdown.Item>
+                                <Dropdown.Item style={{fontWeight: 200}} onClick={() => handleSelectCategory('Рассылка заказов')}>
+                                    Рассылка заказов
+                                </Dropdown.Item>
                                 <Dropdown.Item style={{fontWeight: 200}} onClick={() => handleSelectCategory('Закрыта')}>
                                     Закрыта
                                 </Dropdown.Item>
@@ -184,6 +194,23 @@ const CreatePurchase = ({show, onHide}) => {
                             </DropdownMenu>
                         </Dropdown>
                         <Form.Control style={{width: 200}} placeholder={selectedStatus} readOnly/>
+                    </Row>
+                    <Row className="mt-2">
+                        <Dropdown style={{width: 250}}>
+                            <DropdownToggle style={{fontWeight: 500}}>База распределения затрат</DropdownToggle>
+                            <DropdownMenu>
+                                <Dropdown.Item style={{fontWeight: 200}} onClick={() => handleSelectBaseCost('Сумма заказа')}>
+                                    Сумма заказа
+                                </Dropdown.Item>
+                                <Dropdown.Item style={{fontWeight: 200}} onClick={() => handleSelectBaseCost('Объем товаров')}>
+                                    Объем товаров
+                                </Dropdown.Item>
+                                <Dropdown.Item style={{fontWeight: 200}} onClick={() => handleSelectBaseCost('Количество товаров')}>
+                                    Количество товаров
+                                </Dropdown.Item>
+                            </DropdownMenu>
+                        </Dropdown>
+                        <Form.Control style={{width: 200}} placeholder={selectedBaseCost} readOnly/>
                     </Row>
                     <Row>
                         <Col md={6} className="mt-2" style={{textAlign: 'center', alignItems: 'center', fontWeight: 400}}> Дата начала <Form.Control className="mt-2" type='date' style={{textAlign: 'center', fontWeight: 200}} id="startDate" onBlur={handleStartDateChange}/></Col>

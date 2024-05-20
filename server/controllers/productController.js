@@ -6,12 +6,12 @@ const path = require('path')
 class ProductController {
     async create(req, res, next) {
         try {
-            let {name, categoryId, description, options} = req.body
+            let {name, categoryId, description, fullDescription, volumeProduct, options} = req.body
             const {img} = req.files
             console.log(img)
             let fileName = uuid.v4() + ".jpg"
             img.mv(path.resolve(__dirname, '..', 'static', fileName))
-            const product = await Product.create({name, categoryId, description, img: fileName})
+            const product = await Product.create({name, categoryId, description, fullDescription, volumeProduct, img: fileName})
 
             if (options) {
                 options = JSON.parse(options);

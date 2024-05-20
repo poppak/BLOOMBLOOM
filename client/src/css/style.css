@@ -187,6 +187,26 @@ body{
 
 }
 
-table {
-
+.modal-content {
+    border-radius: 0;
+}
+.circle {
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    border: 1px solid grey;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.circle1 {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    border: 1px solid grey;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

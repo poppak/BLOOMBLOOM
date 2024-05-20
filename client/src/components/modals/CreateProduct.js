@@ -15,6 +15,8 @@ const CreateProduct = observer(({show, onHide}) => {
     }, []);
     const [name, setName] = useState('')
     const [description, setDescription] = useState('')
+    const [fullDescription, setFullDescription] = useState('')
+    const [volumeProduct, setVolumeProduct] = useState('')
     const [file, setFile] = useState('')
     const [selectedCategory, setSelectedCategory] = useState('');
     const [option, setOption] = useState([])
@@ -44,6 +46,8 @@ const CreateProduct = observer(({show, onHide}) => {
         const formData = new FormData()
         formData.append('name', name)
         formData.append('description', description)
+        formData.append('fullDescription', fullDescription)
+        formData.append('volumeProduct', volumeProduct)
         formData.append('img', file)
         formData.append('categoryId', selectedCategory.id)
         option.forEach((opt, index) => {
@@ -69,7 +73,8 @@ const CreateProduct = observer(({show, onHide}) => {
             </Modal.Header>
             <Modal.Body>
                 <Form>
-                    <Form.Control className="mt-2" placeholder={"Наименование товара"} value={name} onChange={e => setName(e.target.value)}/>
+                    <Form.Control className="mt-2" placeholder={"Наименование товара"} value={name}
+                                  onChange={e => setName(e.target.value)}/>
                     <Row className="mt-2">
                         <Dropdown style={{width: 170}}>
                             <DropdownToggle>Категория товара</DropdownToggle>
@@ -85,7 +90,7 @@ const CreateProduct = observer(({show, onHide}) => {
                                 ))}
                             </DropdownMenu>
                         </Dropdown>
-                        <Form.Control style={{width: 150}} placeholder={selectedCategory.name} readOnly />
+                        <Form.Control style={{width: 150}} placeholder={selectedCategory.name} readOnly/>
                     </Row>
                     <Form.Control className="mt-2" type="file" onChange={selectFile}/>
                     <Form.Control
@@ -96,10 +101,29 @@ const CreateProduct = observer(({show, onHide}) => {
                         value={description}
                         onChange={e => setDescription(e.target.value)}
                     />
+                    <Form.Control
+                        as="textarea"
+                        rows={3}
+                        className="mt-2"
+                        placeholder={"Подробное описание товара"}
+                        value={fullDescription}
+                        onChange={e => setFullDescription(e.target.value)}
+                    />
+                    <Col className='d-flex' style={{textAlign: "center", alignSelf: "flex-end"}}>
+                        <Form.Control
+                            type='number'
+                            className="mt-2"
+                            placeholder={"Объем упаковки"}
+                            value={volumeProduct}
+                            style={{width: '160px'}}
+                            onChange={e => setVolumeProduct(e.target.value)}
+                        /> <p style={{textAlign: "center", lineHeight: '0px', alignSelf: "flex-end", marginLeft: 10, fontSize: '20px', fontWeight: 400}}>см³</p>
+                    </Col>
+
                     <hr/>
                     <Row className="justify-content-center">
-                        <Button className="btn-5"
-                                style={{width: '40%', height: 40, fontSize: '18px', fontWeight:400}}
+                    <Button className="btn-5"
+                                style={{width: '40%', height: 40, fontSize: '18px', fontWeight: 400}}
                                 onClick={addOption}
                         >
                             Добавить версию товара
@@ -122,7 +146,9 @@ const CreateProduct = observer(({show, onHide}) => {
 
                             </Col>
                             <Col md={1}>
-                                <Button className="btn-2" style={{width: '10%', fontSize: '18px', fontWeight:400, color: 'red'}} onClick={() => removeOption(i.number)}>
+                                <Button className="btn-2"
+                                        style={{width: '10%', fontSize: '18px', fontWeight: 400, color: 'red'}}
+                                        onClick={() => removeOption(i.number)}>
                                     X
                                 </Button>
                             </Col>
@@ -132,7 +158,7 @@ const CreateProduct = observer(({show, onHide}) => {
                 </Form>
             </Modal.Body>
             <Modal.Footer>
-                <Button onClick={handleClose} style={{fontWeight:400}}>Закрыть</Button>
+                <Button onClick={handleClose} style={{fontWeight: 400}}>Закрыть</Button>
                 <Button onClick={addProduct} style={{color: '#f3a0d5', fontWeight:400}}>Добавить</Button>
             </Modal.Footer>
         </Modal>

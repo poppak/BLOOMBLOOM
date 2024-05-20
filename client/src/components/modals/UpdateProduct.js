@@ -41,7 +41,7 @@ const UpdateProduct = ({show, onHide, selectedProduct }) => {
         >
             <Modal.Header>
                 <Modal.Title id="contained-modal-title-vcenter">
-                    Редактирование товара*
+                    Товар {selectedProduct.name}
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
@@ -64,7 +64,7 @@ const UpdateProduct = ({show, onHide, selectedProduct }) => {
                         </Dropdown>
                         <Form.Control style={{width: 150}} placeholder={selectedCategory ? selectedCategory : cat.find(category => category.id === selectedProduct.categoryId)?.name || ''}  readOnly />
                     </Row>
-                    <Col className="d-flex justify-content-center mt-2" style={{textAlign: 'center', alignItems: 'center', fontWeight: 300}}> Выберите изображение, если хотите его заменить </Col>
+                    <Col className="d-flex justify-content-center mt-2" style={{textAlign: 'center', alignItems: 'center', fontWeight: 300, color: 'red'}}> Выберите изображение, если хотите его заменить </Col>
                     <Form.Control className="mt-2" type="file"/>
 
                     <Form.Control
@@ -74,6 +74,23 @@ const UpdateProduct = ({show, onHide, selectedProduct }) => {
                         placeholder={"Описание товара"}
                         defaultValue={selectedProduct.description}
                     />
+                    <Form.Control
+                        as="textarea"
+                        rows={3}
+                        className="mt-2"
+                        placeholder={"Подробное описание товара"}
+                        value={selectedProduct.fullDescription}
+
+                    />
+                   <Col className='d-flex' style={{textAlign: "center", alignSelf: "flex-end"}}>
+                       <Form.Control
+                           type='number'
+                           style={{width: '100px'}}
+                           className="mt-2"
+                           placeholder={"Объем"}
+                           value={selectedProduct.volumeProduct}
+                       /><p style={{textAlign: "center", lineHeight: '0px', alignSelf: "flex-end", marginLeft: 10, fontSize: '20px', fontWeight: 400}}>см³</p>
+                   </Col>
                     <hr/>
                     <Row className="justify-content-center">
                         <Button className="btn-5"
@@ -83,6 +100,7 @@ const UpdateProduct = ({show, onHide, selectedProduct }) => {
                             Добавить версию товара
                         </Button>
                     </Row>
+                    <Col className="d-flex justify-content-center mt-2" style={{textAlign: 'center', alignItems: 'center', fontWeight: 300, color: 'red'}}> Выберите изображение, если хотите его заменить </Col>
                     {optionsProduct && optionsProduct.map(i =>
                         <Row className="mt-2" key={i.id}>
                             <Col md={6}>

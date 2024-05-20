@@ -4,7 +4,7 @@ import {
     PREORDER_PRODUCT_ROUTE,
     PRODUCT_ROUTE,
     PURCHASE_ROUTE,
-    SHOP_ROUTE
+    SHOP_ROUTE, USER_ROUTE
 } from "./utils/consts";
 import {LOGIN_ROUTE} from "./utils/consts";
 import {REGISTRATION_ROUTE} from "./utils/consts";
@@ -15,6 +15,7 @@ import Product from './pages/ProductPage'
 import Basket from "./pages/Basket";
 import PreorderProduct from "./pages/PreorderProductPage";
 import Purchase from "./pages/PurchasePage"
+import User from "./pages/User"
 
 export const authRoutes = [
     {
@@ -32,6 +33,10 @@ export const authRoutes = [
     {
         path: PURCHASE_ROUTE,
         Component: Purchase
+    },
+    {
+        path: USER_ROUTE,
+        Component: User
     }
 ]
 

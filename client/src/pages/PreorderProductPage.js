@@ -2,37 +2,66 @@ import React, {useContext, useEffect, useState} from 'react';
 import {Button, Col, Container, Image, OverlayTrigger, Row, Tooltip} from "react-bootstrap";
 import QuantitySelector from "../components/QuantitySelector";
 import {SHOP_ROUTE} from "../utils/consts";
-import {useHistory, useLocation, useParams} from "react-router-dom";
+import {useHistory, useParams} from "react-router-dom";
 import {TfiClose} from "react-icons/tfi";
 import {Context} from "../index";
 import {
-    fetchCategories,
+    createBasketProduct, fetchBasketProducts,
+    fetchBaskets,
     fetchOneProduct,
     fetchPreorderProducts,
     fetchProducts,
     fetchPurchases
 } from "../http/productAPI";
+import {check} from "../http/userAPI";
+import Basket from "../components/modals/Basket";
 
 const PreorderProductPage = () => {
     const history = useHistory()
     const {product} = useContext(Context)
+    const {client} = useContext(Context)
     const {id} = useParams()
+    const [user, setUser] = useState({})
     const [loading, setLoading] = useState(true);
     const [preorderProduct, setPreorderProduct] = useState('')
+    const [quantitie, setQuantitie] = useState(1);
+    const [basketVisible, setBasketVisible] = useState(false)
+    const handleUpdateQuantity = (value) => {
+        setQuantitie(value);
+    };
+
+    const handleOptionSelect = (option) => {
+        setPreorderProduct(prevState => ({
+            ...prevState,
+            selectedOption: option
+        }));
+    }
 
     useEffect(() => {
         Promise.all([
-            fetchCategories(),
+            check(),
             fetchProducts(),
             fetchPurchases(),
             fetchPreorderProducts(),
-            fetchOneProduct(id)
-        ]).then(([categories, products, purchases, preorderProducts, preorderProduct]) => {
+            fetchOneProduct(id),
+            fetchBaskets(),
+            fetchBasketProducts(),
+        ]).then(([user, products, purchases, preorderProducts, preorderProduct, baskets, basketProducts]) => {
+            setUser(user);
             product.setProducts(products);
             product.setPurchases(purchases);
             product.setPreorderProducts(preorderProducts);
-            setPreorderProduct(preorderProduct)
+            setPreorderProduct(preorderProduct);
+            client.setBaskets(baskets);
+            client.setBasketProducts(basketProducts)
             setLoading(false);
+            if (!preorderProduct.selectedOption && preorderProduct.options.length > 0) {
+                const defaultOption = preorderProduct.options[0];
+                setPreorderProduct(prevState => ({
+                    ...prevState,
+                    selectedOption: defaultOption
+                }));
+            }
         }).catch(error => {
             console.error('Error loading data:', error);
             setLoading(false);
@@ -47,21 +76,42 @@ const PreorderProductPage = () => {
             (i.purchaseId === product.purchases.find(i => i.statusPurchase === 'Запись открыта').id)
             && (i.productId === preorderProduct.id)
     )
+
     const optionIds = pr.map(i => i.optionId)
     const option = preorderProduct.options.filter((i, index) =>
-        i.id === optionIds[index]
+        optionIds.find(j => j === i.id)
     )
     const price = pr.find(i => i.id).price
-    console.log(option)
+    console.log(optionIds)
     console.log(pr)
 
-    const handleOptionSelect = (option) => {
-        console.log(option.id);
-        setPreorderProduct(prevState => ({
-            ...prevState,
-            selectedOption: option
-        }));
+
+    const selectedOp = preorderProduct.selectedOption
+    let selectedOpId
+    if (selectedOp) {
+        selectedOpId = selectedOp.id;
+    } else {
+        console.log("Ни одна опция не выбрана");
     }
+    const basket = client.baskets.find(b => b.userId === user.id)
+
+    const addBasketProduct = () => {
+        const formData = new FormData()
+        formData.append('basketId', basket.id)
+        formData.append('productId', preorderProduct.id)
+        if (selectedOpId) {
+            formData.append('optionId', selectedOpId)
+        }
+        formData.append('quantity', quantitie)
+        createBasketProduct(formData).then(data => {
+            fetchBasketProducts().then(data => {
+                client.setBasketProducts(data)
+                setBasketVisible(true)
+            })
+        })
+
+    }
+
     return (
         <div className="pageBackground scrollable-content">
             <div>
@@ -91,6 +141,7 @@ const PreorderProductPage = () => {
                                 {price + ' р.'}
                             </div>
                             {option === [] ? <div className="mt-4" style={{fontSize: '16px'}}>Версия</div> : ''}
+                            {console.log(option)}
                             <Row>
 
                                 {option.map(info =>
@@ -112,17 +163,18 @@ const PreorderProductPage = () => {
                             </Row>
                             <Row className="mt-2 d-flex align-items-center">
                                 <div style={{width: '120px', marginBottom: '16px'}}>
-                                    <QuantitySelector/>
+                                    <QuantitySelector onUpdate={handleUpdateQuantity}/>
                                 </div>
                                 <div style={{width: '120px'}}>
-                                    <Button className="btn-6">Выбрать</Button>
+                                    <Button className="btn-6" onClick={addBasketProduct}>Выбрать</Button>
                                 </div>
                             </Row>
                             <Row>
                                 <div style={{fontWeight: 200, fontSize: '18px', marginTop: '4%'}}>
-                                    {preorderProduct.description}
+                                    {preorderProduct.fullDescription}
                                 </div>
                             </Row>
+
 
 
                         </Col>
@@ -130,7 +182,7 @@ const PreorderProductPage = () => {
 
                 </Container>
             </div>
-
+            <Basket show={basketVisible} onHide={() => setBasketVisible(false)}></Basket>
         </div>
 
     );

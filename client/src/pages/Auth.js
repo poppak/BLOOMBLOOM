@@ -13,6 +13,7 @@ const Auth = observer(() => {
     const location = useLocation()
     const history = useHistory()
     const isLogin = location.pathname === LOGIN_ROUTE
+    const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [phone, setPhone] = useState('')
     const [password, setPassword] = useState('')
@@ -23,7 +24,7 @@ const Auth = observer(() => {
             if (isLogin) {
                 data = await login(email, password)
             } else{
-                data = await registration(email, phone, password)
+                data = await registration(name, email, phone, password)
             }
             user.setUser(user)
             user.setIsAuth(true)
@@ -44,12 +45,20 @@ const Auth = observer(() => {
                     {isLogin ?
                         ''
                         :
-                        <Form.Control
-                            className="mt-3"
-                            placeholder="Номер телефона"
-                            value={phone}
-                            onChange={e => setPhone(e.target.value)}
-                        />
+                        <div>
+                            <Form.Control
+                                className="mt-3"
+                                placeholder="Имя"
+                                value={name}
+                                onChange={e => setName(e.target.value)}
+                            />
+                            <Form.Control
+                                className="mt-3"
+                                placeholder="Номер телефона"
+                                value={phone}
+                                onChange={e => setPhone(e.target.value)}
+                            />
+                        </div>
                     }
                     <Form.Control
                         className="mt-2"

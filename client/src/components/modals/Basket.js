@@ -28,7 +28,8 @@ const Basket = ({show, onHide}) => {
     const [orderProducts, setOrderProducts] = useState([]);
     const [basketVisible, setBasketVisible] = useState(false)
     let summa = 0
-    let delivery = 1070
+    let delivery = 0
+    let deliveryInRu = 0
 
     const handleUpdateQuantity = (id, value) => {
         setQuantities(prevQuantities => ({
@@ -65,18 +66,63 @@ const Basket = ({show, onHide}) => {
     if (loading) {
         return <div>Loading...</div>;
     }
-    if (user._isAuth) {
+    if (user._isAuth && product.purchases.find(pur => pur.statusPurchase === "Запись открыта")) {
         let basket = client.baskets.find(b => b.userId === userInfo.id)
         let productBasket = client.basketProducts.filter(i => i.basketId === basket.id)
-        const purchase = product.purchases.find(pur => pur.statusPurchase === "Запись открыта").id
+        let purchase = product.purchases.find(pur => pur.statusPurchase === "Запись открыта")
+        let purchaseId = purchase.id
+        let minQuantity
+        let prices
+        if (purchase.baseCost === 'Количество товаров') {
+            prices = product.preorderProducts.filter(i => i.purchaseId === purchase.id).map(i => i.price)
+            minQuantity = Math.floor(purchase.minSumma / Math.max(...prices))
+        }
+        let ratio
+        if (purchase.baseCost === 'Сумма заказа') {
+            ratio = purchase.planDelivery / purchase.minSumma
+        }
+        let deliveryOne
+        if (purchase.baseCost === 'Объем товаров') {
+            prices = product.preorderProducts.filter(i => i.purchaseId === purchase.id).map(i => i.price)
+            const sumPrices = prices.reduce((acc, price) => acc + price, 0);
+            const averagePrice = sumPrices / prices.length;
+            console.log(averagePrice)
+            minQuantity = Math.floor(purchase.minSumma / averagePrice)
+            console.log(minQuantity)
+            const averageDelivery = purchase.planDelivery / minQuantity
+            console.log(averageDelivery)
+            const preorder = product.preorderProducts.filter(i => i.purchaseId === purchase.id).map(i => i.productId)
+            const volumes = []
+            preorder.map((i, index) => {
+                volumes[index] = product.products.find(j => j.id === i).volumeProduct
+            })
+            const sumVolumes = volumes.reduce((acc, volume) => acc + volume, 0);
+            const averageVolume = sumVolumes / volumes.length;
+            console.log(averageVolume)
+            deliveryOne = averageDelivery / averageVolume
+            console.log(deliveryOne);
+        }
+
         product.preorderProducts.forEach((preorderProduct) => {
-            if (preorderProduct.purchaseId === purchase) {
+            if (preorderProduct.purchaseId === purchaseId) {
+                if (purchase.baseCost === 'Сумма заказа') {
+                    delivery = Math.round(preorderProduct.price * ratio)
+                }
+                if (purchase.baseCost === 'Количество товаров') {
+                    delivery = Math.round(purchase.planDelivery / minQuantity)
+                }
+                if (purchase.baseCost === 'Объем товаров') {
+                    const volume = product.products.find(i => i.id === preorderProduct.productId).volumeProduct
+                    console.log(volume)
+                    delivery = Math.round(deliveryOne * volume)
+                }
                 const productToAdd = product.products.find(prod => prod.id === preorderProduct.productId);
                 if (productToAdd && !product.preorderedProducts.some(p => p.id === productToAdd.id)) {
                     const extendedProduct = {
                         ...productToAdd,
                         price: preorderProduct.price,
                         purchaseId: preorderProduct.purchaseId,
+                        delivery: delivery,
                     };
                     product.setPreorderedProducts([...product.preorderedProducts, extendedProduct]);
                 } else if (!productToAdd) {
@@ -89,7 +135,7 @@ const Basket = ({show, onHide}) => {
         console.log(product.preorderedProducts)
 
         const addOrderProduct = (i) => {
-            const preorderProductId = product.preorderProducts.find(p => p.productId === i.productId && p.optionId === i.optionId && p.purchaseId === purchase).id;
+            const preorderProductId = product.preorderProducts.find(p => p.productId === i.productId && p.optionId === i.optionId && p.purchaseId === purchaseId).id;
 
             // Проверяем, есть ли уже продукт с таким preorderProductId
             const existingProductIndex = orderProducts.findIndex(product => product.preorderProductId === preorderProductId);
@@ -101,7 +147,7 @@ const Basket = ({show, onHide}) => {
                 const newProduct = {
                     preorderProductId: preorderProductId,
                     quantity: i.quantity,
-                    purchaseId: purchase,
+                    purchaseId: purchaseId,
                 };
                 setOrderProducts(prevProducts => [...prevProducts, newProduct]);
             }
@@ -135,9 +181,9 @@ const Basket = ({show, onHide}) => {
             const formData = new FormData()
             formData.append('statusOrder', 'Записан')
             formData.append('userId', userInfo.id)
-            formData.append('purchaseId', purchase)
+            formData.append('purchaseId', purchaseId)
             formData.append('summaOrder', `${summa}`)
-            formData.append('summaDeliveryInRU', `${delivery}`)
+            formData.append('summaDeliveryInRU', `${deliveryInRu}`)
             formData.append('orderProducts', JSON.stringify(orderProducts))
             createOrder(formData).then(data => {
                 productBasket.map(i => deleteBasketProduct(i.id));
@@ -173,14 +219,18 @@ const Basket = ({show, onHide}) => {
                         const name = product.preorderedProducts.find(j => j.id === i.productId).name
                         let option = ''
                         const price = product.preorderedProducts.find(j => j.id === i.productId).price
+                        console.log(product.preorderedProducts)
+                        const del = product.preorderedProducts.find(j => j.id === i.productId).delivery
                         if (i.optionId) {
                             option = product.options.find(j => j.id === i.optionId).name
                         }
                         if (quantities[index]) {
                             orderProducts[index].quantity = quantities[index];
                             summa = summa + price * quantities[index];
+                            deliveryInRu = deliveryInRu + del * quantities[index]
                         } else {
                             summa = summa + price * i.quantity;
+                            deliveryInRu = deliveryInRu + del * i.quantity
                         }
                         return (
                             <div>
@@ -204,8 +254,8 @@ const Basket = ({show, onHide}) => {
                     })}
                     <div className='border-top'></div>
                     <Row className="d-flex justify-content-end mt-4" style={{fontWeight: 300, marginRight: '2px', fontSize: '16px'}}>Сумма: {summa} р.</Row>
-                    <Row className="d-flex justify-content-end" style={{fontWeight: 300, marginRight: '2px', fontSize: '16px'}}>Доставка до РФ: {delivery} р.</Row>
-                    <Row className="d-flex justify-content-end" style={{fontWeight: 400, marginRight: '2px', fontSize: '23px'}}>Итоговая сумма: {summa+delivery} р.</Row>
+                    <Row className="d-flex justify-content-end" style={{fontWeight: 300, marginRight: '2px', fontSize: '16px'}}>Доставка до РФ: {deliveryInRu} р.</Row>
+                    <Row className="d-flex justify-content-end" style={{fontWeight: 400, marginRight: '2px', fontSize: '23px'}}>Итоговая сумма: {summa+deliveryInRu} р.</Row>
                     <Row className='d-flex justify-content-center mt-4'><Button className="btn-2" onClick={addOrder}>Участвовать</Button></Row>
                 </Modal.Body>
 

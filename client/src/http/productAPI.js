@@ -23,8 +23,16 @@ export const updatePurchase = async (id, updatedPurchase) => {
     const {data} = await $authHost.put(`api/purchase/${id}`, updatedPurchase);
     return data;
 }
+export const createPreorderProduct = async (preorderProduct) => {
+    const {data} = await $authHost.post('api/preorder_product/', preorderProduct)
+    return data
+}
 export const fetchPreorderProducts = async () => {
     const {data} = await $host.get('api/preorder_product')
+    return data
+}
+export const deletePreorderProduct = async (purchaseId, productId) => {
+    const {data} = await $authHost.delete('api/preorder_product/' + purchaseId + '/' + productId)
     return data
 }
 export const fetchOneProduct = async (id) => {
@@ -62,6 +70,11 @@ export const createOrder = async (order) => {
 export const fetchOrders = async () => {
     const {data} = await $authHost.get('api/order/')
     return data
+}
+export const updateOrder = async (id, order, statusOrder) => {
+    const dataToSend = { ...order, statusOrder: statusOrder };
+    const {data} = await $authHost.put(`api/order/${id}`, dataToSend);
+    return data;
 }
 export const fetchOrdersProduct = async () => {
     const {data} = await $authHost.get('api/order_product/')

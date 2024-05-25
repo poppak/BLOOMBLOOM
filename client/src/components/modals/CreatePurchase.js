@@ -230,7 +230,7 @@ const CreatePurchase = ({show, onHide}) => {
                                 style={{width: '40%', height: 40, fontSize: '18px', fontWeight:400}}
                                 onClick={() => {setProductVisible(true)}}
                         >
-                            Добавить товар
+                            Добавить товары
                         </Button>
                     </Row>
                     <Table striped bordered hover style={{borderCollapse: 'collapse', borderColor: 'transparent', borderBottom: '1px lightgrey'}}>

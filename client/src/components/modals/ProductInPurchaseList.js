@@ -46,8 +46,9 @@ const ProductInPurchaseList = ({show, onHide, purchase}) => {
     }
 
     const preorderProducts = product.preorderProducts.filter(i => i.purchaseId === purchase.id)
-    const products = client.ordersProduct
     if (client.orders.find(i => i.purchaseId === purchase.id)) {
+        const orders = client.orders.filter(i => i.purchaseId === purchase.id).map(i => i.id)
+        const products = client.ordersProduct.filter(i => orders.includes(i.orderId))
         let summa = 0
         const combinedProducts = products.reduce((acc, curr) => {
             const productId = preorderProducts.find(p => p.id === curr.preorderProductId).productId;

@@ -21,7 +21,7 @@ class basketProductController {
     }
     async delete(req, res, next) {
         try {
-            const {id} = req.params; // предположим, что вы передаете id продукта для удаления через параметры маршрута
+            const {id} = req.params;
             const deletedProduct = await BasketProduct.destroy({where: {id}});
 
             if (!deletedProduct) {

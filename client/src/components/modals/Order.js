@@ -53,24 +53,27 @@ const Order = ({show, onHide, selectedOrder}) => {
     if (loading) {
         return <div>Loading...</div>;
     }
-    const purchase = product.purchases.find(pur => pur.statusPurchase === "Запись открыта").id
-    product.preorderProducts.forEach((preorderProduct) => {
-        if (preorderProduct.purchaseId === purchase) {
-            const productToAdd = product.products.find(prod => prod.id === preorderProduct.productId);
-            if (productToAdd && !product.preorderedProducts.some(p => p.id === productToAdd.id)) {
-                const extendedProduct = {
-                    ...productToAdd,
-                    price: preorderProduct.price,
-                    purchaseId: preorderProduct.purchaseId
-                };
-                product.setPreorderedProducts([...product.preorderedProducts, extendedProduct]);
-            } else if (!productToAdd) {
-                console.log('Продукт с id ' + preorderProduct.productId + ' не найден');
+    if (selectedOrder.statusOrder === 'Записан') {
+        const purchase = product.purchases.find(pur => pur.statusPurchase === "Запись открыта").id
+        product.preorderProducts.forEach((preorderProduct) => {
+            if (preorderProduct.purchaseId === purchase) {
+                const productToAdd = product.products.find(prod => prod.id === preorderProduct.productId);
+                if (productToAdd && !product.preorderedProducts.some(p => p.id === productToAdd.id)) {
+                    const extendedProduct = {
+                        ...productToAdd,
+                        price: preorderProduct.price,
+                        purchaseId: preorderProduct.purchaseId
+                    };
+                    product.setPreorderedProducts([...product.preorderedProducts, extendedProduct]);
+                } else if (!productToAdd) {
+                    console.log('Продукт с id ' + preorderProduct.productId + ' не найден');
+                }
+            } else {
+                console.log(preorderProduct.id + ' не входит в закупку');
             }
-        } else {
-            console.log(preorderProduct.id + ' не входит в закупку');
-        }
-    });
+        });
+    }
+
     console.log(product.preorderedProducts)
 
     const handleProduct = (i) => {
@@ -141,14 +144,14 @@ const Order = ({show, onHide, selectedOrder}) => {
                     } else {
                         img = product.products.find(j => j.id === preorderProduct.productId).img;
                     }
-                    const name = product.preorderedProducts.find(j => j.id === preorderProduct.productId).name
-                    const desc = product.preorderedProducts.find(j => j.id === preorderProduct.productId).description
+                    const name = product.products.find(j => j.id === preorderProduct.productId).name
+                    const desc = product.products.find(j => j.id === preorderProduct.productId).description
                     let option = ''
-                    const price = product.preorderedProducts.find(j => j.id === preorderProduct.productId).price
+                    const price = preorderProduct.price
                     if (preorderProduct.optionId) {
                         option = product.options.find(j => j.id === preorderProduct.optionId).name
                     }
-                    quantities[index] ? summa = summa + price * quantities[index] : summa = summa + price
+                    quantities[index] ? summa = summa + price * quantities[index] : summa = summa + price * i.quantity
 
                     return (
                         <div>
@@ -173,7 +176,7 @@ const Order = ({show, onHide, selectedOrder}) => {
                 })}
                 <div className='border-top'></div>
                 <Row className="d-flex justify-content-end mt-4" style={{fontWeight: 300, marginRight: '2px', fontSize: '16px'}}>Сумма: {summa} р.</Row>
-                <Row className="d-flex justify-content-end" style={{fontWeight: 300, marginRight: '2px', fontSize: '16px'}}>Доставка до РФ: {selectedOrder.summaDelivery ? selectedOrder.summaDelivery + ' р.' : '―'}</Row>
+                <Row className="d-flex justify-content-end" style={{fontWeight: 300, marginRight: '2px', fontSize: '16px'}}>Доставка до РФ: {selectedOrder.summaDeliveryInRU ? selectedOrder.summaDeliveryInRU + ' р.' : '―'}</Row>
                 <Row className="d-flex justify-content-end" style={{fontWeight: 300, marginRight: '2px', fontSize: '16px'}}>Доставка по РФ: {delivery ? delivery + ' p.' : '―'}</Row>
                 <Row className="d-flex justify-content-end" style={{fontWeight: 400, marginRight: '2px', fontSize: '23px'}}>Итоговая сумма: {summa+selectedOrder.summaDelivery+delivery ? summa+selectedOrder.summaDelivery+delivery + ' р.' : '―'} </Row>
                 {selectedOrder.statusOrder === 'Записан' ? <Row className='d-flex justify-content-center mt-4'><Button className="btn-2">Отменить заказ</Button></Row> : ''}

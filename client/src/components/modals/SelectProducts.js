@@ -3,15 +3,27 @@ import {Context} from "../../index";
 import {Button, Form, Image, Modal, Table} from "react-bootstrap";
 import {fetchOptions, fetchPreorderProducts, fetchProducts} from "../../http/productAPI";
 
-const SelectProducts = ({show, onHide, selectedProducts, setSelectedProducts}) => {
+const SelectProducts = ({show, onHide, selectedProducts, setSelectedProducts, productsPur, optionsPur}) => {
     const {product} = useContext(Context)
+    const [productsInPur, setProductsInPur] = useState([])
     useEffect(() => {
         fetchProducts().then(data => product.setProducts(data))
         fetchPreorderProducts().then(data => product.setPreorderProducts(data))
         fetchOptions().then((data => product.setOptions(data)))
     }, []);
-    const products = product.products
-    const options = product.options
+    let products
+    let options
+    if (productsPur && optionsPur) {
+        const opIds = optionsPur.map(op => op !== null ? op.id : false)
+        const prIds = productsPur.map(pr => pr.id)
+        const filteredPrIds = prIds.filter(i => !product.options.find(op => op.productId === i.id))
+        options = product.options.filter(i => !opIds.includes(i.id))
+        const optionIds = options.map(i => i.productId)
+        products = product.products.filter(i => !filteredPrIds.includes(i.id) || optionIds.includes(i.id))
+    } else {
+        products = product.products
+        options = product.options
+    }
 
     const handleProductOptionClick = (product, option) => {
         const existingProductIndex = selectedProducts.findIndex(sp => sp.product.id === product.id);
@@ -36,6 +48,7 @@ const SelectProducts = ({show, onHide, selectedProducts, setSelectedProducts}) =
             setSelectedProducts([...selectedProducts, { product, options: [option] }]);
         }
     };
+
     const handleProductClick = (product) => {
         if (selectedProducts.some(sp => sp.product.id === product.id)) {
             setSelectedProducts(selectedProducts.filter(sp => sp.product.id !== product.id));
@@ -48,6 +61,7 @@ const SelectProducts = ({show, onHide, selectedProducts, setSelectedProducts}) =
             console.log(selectedProducts);
             onHide();
         };
+
 
         return (
             <Modal show={show}

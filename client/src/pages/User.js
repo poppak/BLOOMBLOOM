@@ -87,10 +87,6 @@ const User = () => {
                         summaDeliveriStyle = { color: 'black' };
                         summaDeliveriRFStyle = { color: 'black' };
                         break;
-                    case 'Оплачен':
-                    case 'Заказан у поставщика':
-                    case 'Получен на кор. адресе':
-                    case 'Отправлен в РФ':
                     case 'Ожидает оформления доставки по РФ':
                         statusStyle = { backgroundColor: "red", color: "white" };
                         summaDeliveriRFStyle = { color: 'black' };
@@ -169,7 +165,7 @@ const User = () => {
                         </Col>
                         <Col className="col-md-1 mt-4" style={{paddingLeft: '10px', fontSize: '14px', fontWeight: 300, alignItems: "center", textAlign: 'right'}}>
                             доставка до РФ
-                            {i.summaDelivery ? <p style={{...summaDeliveriStyle, fontWeight: 400, fontSize: '20px'}}>{i.summaDelivery} р.</p> : ''}
+                            {i.summaDeliveryInRU ? <p style={{...summaDeliveriStyle, fontWeight: 400, fontSize: '20px'}}>{i.summaDeliveryInRU} р.</p> : ''}
 
                         </Col>
                         <Col className="col-md-1 mt-4" style={{paddingLeft: '10px', fontSize: '14px', fontWeight: 300, alignItems: "center", textAlign: 'right'}}>

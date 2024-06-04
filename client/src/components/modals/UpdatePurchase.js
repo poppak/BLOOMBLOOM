@@ -7,7 +7,7 @@ import {
     createPreorderProduct,
     createPurchase,
     deleteBasketProduct, deletePreorderProduct,
-    fetchBasketProducts,
+    fetchBasketProducts, fetchOrders,
     fetchProducts,
     fetchPurchases, updateOrder,
     updatePurchase
@@ -25,6 +25,7 @@ const UpdatePurchase = ({show, onHide, selectedPurchase }) => {
         fetchProducts().then(data => {
             product.setProducts(data);
         })
+        fetchOrders().then(data => client.setOrders(data))
     }, []);
     const [selectedStatus, setSelectedStatus] = useState('');
     const [selectedBaseCost, setSelectedBaseCost] = useState('');
@@ -36,12 +37,14 @@ const UpdatePurchase = ({show, onHide, selectedPurchase }) => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [minSumma, setMinSumma] = useState('');
-    const [factSumma, setFactSumma] = useState('');
     const [planDelivery, setPlanDelivery] = useState('');
     const [factDelivery, setFactDelivery] = useState('');
     const [preorderProduct, setPreorderProduct] = useState([])
     const purchaseProduct = product.preorderProducts.filter(prod => prod.purchaseId === selectedPurchase.id)
     console.log(purchaseProduct)
+    const orders = client.orders.filter(i => i.purchaseId === selectedPurchase.id)
+    let factSum = 0
+    orders.forEach(i => factSum = factSum + i.summaOrder)
     const products = purchaseProduct.map((pur) => {
         return product.products.find(pr => pr.id === pur.productId);
     }).filter((value, index, self) => self.indexOf(value) === index);
@@ -69,7 +72,7 @@ const UpdatePurchase = ({show, onHide, selectedPurchase }) => {
         dateStart: startDate ? startDate : selectedPurchase.dateStart,
         dateFinish: endDate ? endDate : selectedPurchase.dateFinish,
         minSumma: minSumma ? `${minSumma}` : selectedPurchase.minSumma,
-        factSumma: factSumma ? `${factSumma}` : selectedPurchase.factSumma,
+        factSumma: factSum ? `${factSum}` : selectedPurchase.factSumma,
         planDelivery: planDelivery ? `${planDelivery}` : selectedPurchase.planDelivery,
         factDelivery: factDelivery ? `${factDelivery}` : selectedPurchase.factDelivery,
         baseCost: selectedBaseCost ? selectedBaseCost : selectedPurchase.baseCost,
@@ -228,6 +231,7 @@ const UpdatePurchase = ({show, onHide, selectedPurchase }) => {
             });
     };
 
+
     return (
         <Modal
             show={show}
@@ -316,7 +320,7 @@ const UpdatePurchase = ({show, onHide, selectedPurchase }) => {
                         <Col md={6} className="mt-2" style={{textAlign: 'center', alignItems: 'center', fontWeight: 400}}> Планируемая сумма доставки до РФ <Form.Control className="mt-2" type='number' style={{textAlign: 'center', fontWeight: 200}} value={selectedPurchase.planDelivery} onBlur={e => setPlanDelivery(e.target.value)}/></Col>
                     </Row>
                     <Row>
-                        <Col md={6} className="mt-2" style={{textAlign: 'center', alignItems: 'center', fontWeight: 400}}> Фактическая сумма закупки <Form.Control className="mt-2" type='number' style={{textAlign: 'center', fontWeight: 200}} disabled value={selectedPurchase.factSumma} onBlur={e => setFactSumma(e.target.value)}/></Col>
+                        <Col md={6} className="mt-2" style={{textAlign: 'center', alignItems: 'center', fontWeight: 400}}> Фактическая сумма закупки <Form.Control className="mt-2" type='number' style={{textAlign: 'center', fontWeight: 200}} disabled value={factSum}/></Col>
                         <Col md={6} className="mt-2" style={{textAlign: 'center', alignItems: 'center', fontWeight: 400}}> Фактическая сумма доставки до РФ <Form.Control className="mt-2" type='number' style={{textAlign: 'center', fontWeight: 200}} disabled={selectedStatus !== 'Отправлена в РФ'} value={selectedPurchase.factDelivery} onBlur={e => setFactDelivery(e.target.value)}/></Col>
                     </Row>
                     <hr/>

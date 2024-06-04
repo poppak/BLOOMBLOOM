@@ -10,9 +10,6 @@ import {ADMIN_ROUTE, LOGIN_ROUTE, SHOP_ROUTE, USER_ROUTE} from "../utils/consts"
 import {BsBoxArrowRight, BsBoxArrowInRight, BsPersonFill, BsFileSpreadsheet} from 'react-icons/bs';
 import Basket from "../components/modals/Basket";
 import {LiaShoppingBagSolid} from "react-icons/lia";
-import {HiOutlineShoppingBag} from "react-icons/hi";
-import {PiHandbagLight} from "react-icons/pi";
-import {SlHandbag} from "react-icons/sl";
 import {RiAdminFill} from "react-icons/ri";
 
 

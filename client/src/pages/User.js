@@ -21,6 +21,27 @@ const User = () => {
     const [user, setUser] = useState({})
     const [orderVisible, setOrderVisible] = useState(false)
     const [selectedOrderIndex, setSelectedOrderIndex] = useState(null);
+    const ProgressBar = ({ percent }) => {
+        const progressStyle = {
+            backgroundColor: '#bcfe00',
+            width: `${percent}%`,
+            alignItems: 'center'
+        };
+
+        return (
+            <div className="progress-bar">
+                <div className="progress-container" style={{display: 'flex', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.03)'}}>
+                    <div className="progress" style={progressStyle}>
+                        <div className='progress-text'
+                             style={{flex: 1, textAlign: 'center', fontWeight: 400}}>{percent}%
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        );
+    };
+    const [progress, setProgress] = useState(0);
 
     useEffect(() => {
         Promise.all([
@@ -41,6 +62,23 @@ const User = () => {
             client.setOrders(orders);
             client.setOrdersProduct(ordersProduct);
             setLoading(false);
+                const purchase = product.purchases.find(pur => pur.statusPurchase === "Запись открыта")
+                const purchaseId = purchase.id
+
+                const order = client.orders.filter(i => i.purchaseId === purchaseId)
+                let factSumma = 0
+                order.forEach(i => factSumma = factSumma + i.summaOrder)
+                let percent = Math.floor(factSumma / purchase.minSumma * 100)
+                let currentProgress = 0;
+                const interval = setInterval(() => {
+                    currentProgress += 1;
+                    if (currentProgress > 100 || currentProgress > percent) {
+                        clearInterval(interval);
+                    } else {
+                        setProgress(currentProgress);
+                    }
+                }, 15);
+
         }).catch(error => {
             console.error('Error loading data:', error);
             setLoading(false);
@@ -59,9 +97,24 @@ const User = () => {
     let monthNames = ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
     return (
         <Container className="mt-4">
-            <a style={{fontWeight: 400, color: '#f3a0d5'}}>{user.name}</a>
+            <a style={{fontSize: '25px',fontWeight: 400, color: '#f3a0d5'}}>{user.name}</a>
+            {product.purchases.find(i => i.statusPurchase === 'Запись открыта') ?
+                client.orders.filter(i => i.userId === user.id).find(i => i.purchaseId === product.purchases.find(i => i.statusPurchase === 'Запись открыта').id) ?
+                <Row className="mt-3 d-flex align-items-center">
+                    <span style={{width: '33%', fontSize: '20px', fontWeight: 300}}>Состояние открытой закупки, в которой я участвую</span>
+                    <div style={{width: '40%'}}><ProgressBar percent={progress}/></div>
+                </Row>
+                :
+                ''
+                :
+                ''
+            }
             <h1 className="mt-4">Мои заказы</h1>
-            {orders.map((i, index) => {
+            {orders.sort((a, b) => {
+                const dateA = new Date(a.createdAt);
+                const dateB = new Date(b.createdAt);
+                return dateB - dateA;
+            }).map((i, index) => {
                 let statusStyle = { backgroundColor: "#f3a0d5", color: "white" };
                 let summaOrderStyle = {color: '#f3a0d5'}
                 let summaDeliveriStyle = {color: '#f3a0d5'}

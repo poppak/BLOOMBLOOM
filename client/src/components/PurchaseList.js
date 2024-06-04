@@ -49,7 +49,11 @@ const PurchaseList = () => {
             </tr>
             </thead>
             <tbody>
-            {purchasesToDisplay.map((purchase, index) => (
+            {purchasesToDisplay.sort((a, b) => {
+                const dateA = new Date(a.createdAt);
+                const dateB = new Date(b.createdAt);
+                return dateA - dateB;
+            }).map((purchase, index) => (
                 <tr key={purchase.id} style={{fontSize: '20px'}} onClick={() => handlePurchaseClick(index)}>
                     <td style={{textAlign: 'center', fontSize: '16px'}}>{index + 1}</td>
                     <td style={{fontWeight: '400'}}>{formatDate(purchase.dateStart)}</td>

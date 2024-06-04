@@ -12,6 +12,7 @@ import {PREORDER_PRODUCT_ROUTE} from "../../utils/consts";
 import {Button, Col, Image, Modal, Row} from "react-bootstrap";
 import QuantitySelector1 from "../QuantitySelector1";
 import {TfiClose} from "react-icons/tfi";
+import Payment from "./Payment";
 
 const Order = ({show, onHide, selectedOrder}) => {
     const {client} = useContext(Context)
@@ -20,6 +21,7 @@ const Order = ({show, onHide, selectedOrder}) => {
     const [loading, setLoading] = useState(true)
     const productOrder = client.ordersProduct.filter(i => i.orderId === selectedOrder.id)
     const [quantities, setQuantities] = useState({});
+    const [paymentVisible, setPaymentVisible] = useState(false)
     let summa = 0
     let fullSumma = 0
     let delivery = selectedOrder.summaDelivery
@@ -108,10 +110,6 @@ const Order = ({show, onHide, selectedOrder}) => {
             summaDeliveriStyle = { color: 'black' };
             summaDeliveriRFStyle = { color: 'black' };
             break;
-        case 'Оплачен':
-        case 'Заказан у поставщика':
-        case 'Получен на кор. адресе':
-        case 'Отправлен в РФ':
         case 'Ожидает оформления доставки по РФ':
             statusStyle = { backgroundColor: "red", color: "white" };
             summaDeliveriRFStyle = { color: 'black' };
@@ -181,11 +179,12 @@ const Order = ({show, onHide, selectedOrder}) => {
                 <Row className="d-flex justify-content-end" style={{fontWeight: 400, marginRight: '2px', fontSize: '23px'}}>Итоговая сумма: {summa+selectedOrder.summaDelivery+delivery ? summa+selectedOrder.summaDelivery+delivery + ' р.' : '―'} </Row>
                 {selectedOrder.statusOrder === 'Записан' ? <Row className='d-flex justify-content-center mt-4'><Button className="btn-2">Отменить заказ</Button></Row> : ''}
                 {selectedOrder.statusOrder === 'Ожидает оформления доставки по РФ' ? <Row className='d-flex justify-content-center mt-4'><Button className="btn-2" style={{color: "red"}}>Оформить доставку</Button></Row> : ''}
-                {selectedOrder.statusOrder === 'Ожидает оплаты' ? <Row className='d-flex justify-content-center mt-4'><Button className="btn-2" style={{color: "red"}}>Оплатить заказ</Button></Row> : ''}
+                {selectedOrder.statusOrder === 'Ожидает оплаты' ? <Row className='d-flex justify-content-center mt-4'><Button className="btn-2" style={{color: "red"}} onClick={() => setPaymentVisible(true)}>Оплатить заказ</Button></Row> : ''}
 
             </Modal.Body>
-
+            <Payment show={paymentVisible} onHide={() => setPaymentVisible(false)} order={selectedOrder}></Payment>
         </Modal>
+
     );
 };
 

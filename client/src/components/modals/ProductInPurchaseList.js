@@ -8,7 +8,8 @@ import {
     fetchProducts,
     fetchPurchases
 } from "../../http/productAPI";
-import {Image, Modal, Table} from "react-bootstrap";
+import {Button, Image, Modal, Table} from "react-bootstrap";
+import { utils, writeFile } from 'xlsx';
 
 const ProductInPurchaseList = ({show, onHide, purchase}) => {
     const {client} = useContext(Context)
@@ -46,6 +47,12 @@ const ProductInPurchaseList = ({show, onHide, purchase}) => {
     }
 
     const preorderProducts = product.preorderProducts.filter(i => i.purchaseId === purchase.id)
+    const exportToExcel = () => {
+        const ws = utils.table_to_sheet(document.getElementById('products'));
+        const wb = utils.book_new();
+        utils.book_append_sheet(wb, ws, 'Лист1');
+        writeFile(wb, 'Товары.xlsx');
+    };
     if (client.orders.find(i => i.purchaseId === purchase.id)) {
         const orders = client.orders.filter(i => i.purchaseId === purchase.id).map(i => i.id)
         const products = client.ordersProduct.filter(i => orders.includes(i.orderId))
@@ -80,6 +87,7 @@ const ProductInPurchaseList = ({show, onHide, purchase}) => {
             return acc;
         }, []);
         combinedProducts.sort((a, b) => a.name.localeCompare(b.name));
+
         return (
             <Modal show={show}
                    onHide={onHide}
@@ -91,7 +99,7 @@ const ProductInPurchaseList = ({show, onHide, purchase}) => {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Table striped bordered hover style={{borderCollapse: 'collapse', borderColor: 'transparent', borderBottom: '1px lightgrey'}}>
+                    <Table striped bordered hover style={{borderCollapse: 'collapse', borderColor: 'transparent', borderBottom: '1px lightgrey'}} id='products'>
                         <thead>
                         <tr style={{textAlign: 'center'}}>
                             <th style={{fontWeight: '400', width: 20}}></th>
@@ -121,6 +129,7 @@ const ProductInPurchaseList = ({show, onHide, purchase}) => {
                     </Table>
                     <div style={{textAlign: "center"}}> Сумма закупки: <span style={{fontWeight: '400'}}> {summa} р.</span></div>
                 </Modal.Body>
+                <Modal.Footer><Button className='btn-2' onClick={() => exportToExcel()}>Экспорт</Button></Modal.Footer>
             </Modal>
         );
     }
